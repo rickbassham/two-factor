@@ -37,18 +37,17 @@ namespace TwoFactorWeb.Controllers
 
                     if (profile != null && !string.IsNullOrEmpty(profile.TwoFactorSecret))
                     {
-                        /*
                         // Prevent the user from attempting to brute force the two factor secret.
                         // Without this, an attacker, if they know your password already, could try to brute
                         // force the two factor code. They only need to try 1,000,000 distinct codes in 3 minutes.
-                        // This limits them to only being able to try about 180 in 3 minutes.
+                        // This throttles them down to a managable level.
                         if (profile.LastLoginAttemptUtc.HasValue && profile.LastLoginAttemptUtc > DateTime.UtcNow - TimeSpan.FromSeconds(1))
                         {
-                            System.Threading.Thread.Sleep(1000);
+                            System.Threading.Thread.Sleep(5000);
                         }
 
                         profile.LastLoginAttemptUtc = DateTime.UtcNow;
-                        */
+
                         if (TimeBasedOneTimePassword.IsValid(profile.TwoFactorSecret, model.TwoFactorCode))
                         {
                             FormsAuthentication.SetAuthCookie(model.UserName, model.RememberMe);
