@@ -26,11 +26,18 @@ namespace TwoFactorWeb
         {
             get
             {
-                return (DateTime?)base["LastLoginAttempt"];
+                try
+                {
+                    return (DateTime?)base["LastLoginAttemptUtc"];
+                }
+                catch
+                {
+                    return null;
+                }
             }
             set
             {
-                base["LastLoginAttempt"] = value;
+                base["LastLoginAttemptUtc"] = value;
                 Save();
             }
         }
