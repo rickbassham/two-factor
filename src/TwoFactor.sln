@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TwoFactorWeb", "TwoFactorWe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TwoFactorBruteForceAttempt", "TwoFactorBruteForceAttempt\TwoFactorBruteForceAttempt.csproj", "{CADE3FD2-312B-41ED-A93B-B751B98A3BFE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TwoFactor.Tests", "TwoFactor.Tests\TwoFactor.Tests.csproj", "{EEBF2946-1A52-42A2-B017-1F9C91A6F0A7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -59,6 +61,16 @@ Global
 		{CADE3FD2-312B-41ED-A93B-B751B98A3BFE}.Release|Mixed Platforms.Build.0 = Release|x86
 		{CADE3FD2-312B-41ED-A93B-B751B98A3BFE}.Release|x86.ActiveCfg = Release|x86
 		{CADE3FD2-312B-41ED-A93B-B751B98A3BFE}.Release|x86.Build.0 = Release|x86
+		{EEBF2946-1A52-42A2-B017-1F9C91A6F0A7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EEBF2946-1A52-42A2-B017-1F9C91A6F0A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EEBF2946-1A52-42A2-B017-1F9C91A6F0A7}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{EEBF2946-1A52-42A2-B017-1F9C91A6F0A7}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{EEBF2946-1A52-42A2-B017-1F9C91A6F0A7}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{EEBF2946-1A52-42A2-B017-1F9C91A6F0A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EEBF2946-1A52-42A2-B017-1F9C91A6F0A7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EEBF2946-1A52-42A2-B017-1F9C91A6F0A7}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{EEBF2946-1A52-42A2-B017-1F9C91A6F0A7}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{EEBF2946-1A52-42A2-B017-1F9C91A6F0A7}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
