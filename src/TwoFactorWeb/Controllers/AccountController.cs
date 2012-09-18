@@ -9,10 +9,11 @@ using TwoFactorWeb.Models;
 using System.Text;
 using TwoFactor;
 using System.Security.Cryptography;
+using System.Threading.Tasks;
 
 namespace TwoFactorWeb.Controllers
 {
-    public class AccountController : Controller
+    public class AccountController : AsyncController
     {
 
         //
@@ -26,8 +27,7 @@ namespace TwoFactorWeb.Controllers
         //
         // POST: /Account/LogOn
 
-        [HttpPost]
-        public ActionResult LogOn(LogOnModel model, string returnUrl)
+        private void DoLogOn(LogOnModel model, string returnUrl)
         {
             if (ModelState.IsValid)
             {
@@ -50,15 +50,15 @@ namespace TwoFactorWeb.Controllers
 
                         if (TimeBasedOneTimePassword.IsValid(profile.TwoFactorSecret, model.TwoFactorCode))
                         {
-                            FormsAuthentication.SetAuthCookie(model.UserName, model.RememberMe);
                             if (Url.IsLocalUrl(returnUrl) && returnUrl.Length > 1 && returnUrl.StartsWith("/")
                                 && !returnUrl.StartsWith("//") && !returnUrl.StartsWith("/\\"))
                             {
-                                return Redirect(returnUrl);
+                                AsyncManager.Parameters["returnUrl"] = returnUrl;
                             }
                             else
                             {
-                                return RedirectToAction("Index", "Home");
+                                AsyncManager.Parameters["action"] = "Index";
+                                AsyncManager.Parameters["controller"] = "Home";
                             }
                         }
                         else
@@ -77,8 +77,33 @@ namespace TwoFactorWeb.Controllers
                 }
             }
 
-            // If we got this far, something failed, redisplay form
-            return View(model);
+            AsyncManager.Parameters["model"] = model;
+            AsyncManager.OutstandingOperations.Decrement();
+        }
+
+        [HttpPost]
+        public void LogOnAsync(LogOnModel model, string returnUrl)
+        {
+            AsyncManager.OutstandingOperations.Increment();
+            Task.Factory.StartNew(() => { DoLogOn(model, returnUrl); });
+        }
+
+        public ActionResult LogOnCompleted(string returnUrl, string action, string controller, LogOnModel model)
+        {
+            if (returnUrl != null)
+            {
+                FormsAuthentication.SetAuthCookie(model.UserName, model.RememberMe);
+                return Redirect(returnUrl);
+            }
+            else if (action != null && controller != null)
+            {
+                FormsAuthentication.SetAuthCookie(model.UserName, model.RememberMe);
+                return RedirectToAction(action, controller);
+            }
+            else
+            {
+                return View(model);
+            }
         }
 
         //
