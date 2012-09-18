@@ -24,9 +24,9 @@ namespace TwoFactor
             // Convert the 4 bytes into an integer, ignoring the sign.
             int binary =
                 ((hash[offset] & 0x7f) << 24)
-                | ((hash[offset + 1] & 0xff) << 16)
-                | ((hash[offset + 2] & 0xff) << 8)
-                | (hash[offset + 3] & 0xff);
+                | (hash[offset + 1] << 16)
+                | (hash[offset + 2] << 8)
+                | (hash[offset + 3]);
 
             // Limit the number of digits
             int password = binary % (int)Math.Pow(10, digits);
