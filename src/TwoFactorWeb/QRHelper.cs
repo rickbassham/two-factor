@@ -22,7 +22,7 @@ namespace TwoFactorWeb
             QrEncoder enc = new QrEncoder(ErrorCorrectionLevel.H);
             var code = enc.Encode(content);
 
-            Renderer r = new Renderer(15, Brushes.Black, Brushes.White);
+            Renderer r = new Renderer(5, Brushes.Black, Brushes.White);
 
             using (MemoryStream ms = new MemoryStream())
             {
