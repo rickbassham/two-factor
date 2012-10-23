@@ -29,36 +29,43 @@ namespace TwoFactorWeb.Controllers
 
         private void DoLogOn(LogOnModel model, string returnUrl)
         {
-            if (ModelState.IsValid)
+            try
             {
-                if (Membership.ValidateUser(model.UserName, model.Password))
+                if (ModelState.IsValid)
                 {
-                    var profile = TwoFactorProfile.GetByUserName(model.UserName);
-
-                    if (profile != null && !string.IsNullOrEmpty(profile.TwoFactorSecret))
+                    if (Membership.ValidateUser(model.UserName, model.Password))
                     {
-                        // Prevent the user from attempting to brute force the two factor secret.
-                        // Without this, an attacker, if they know your password already, could try to brute
-                        // force the two factor code. They only need to try 1,000,000 distinct codes in 3 minutes.
-                        // This throttles them down to a managable level.
-                        if (profile.LastLoginAttemptUtc.HasValue && profile.LastLoginAttemptUtc > DateTime.UtcNow - TimeSpan.FromSeconds(1))
-                        {
-                            System.Threading.Thread.Sleep(5000);
-                        }
+                        var profile = TwoFactorProfile.GetByUserName(model.UserName);
 
-                        profile.LastLoginAttemptUtc = DateTime.UtcNow;
-
-                        if (TimeBasedOneTimePassword.IsValid(profile.TwoFactorSecret, model.TwoFactorCode))
+                        if (profile != null && !string.IsNullOrEmpty(profile.TwoFactorSecret))
                         {
-                            if (Url.IsLocalUrl(returnUrl) && returnUrl.Length > 1 && returnUrl.StartsWith("/")
-                                && !returnUrl.StartsWith("//") && !returnUrl.StartsWith("/\\"))
+                            // Prevent the user from attempting to brute force the two factor secret.
+                            // Without this, an attacker, if they know your password already, could try to brute
+                            // force the two factor code. They only need to try 1,000,000 distinct codes in 3 minutes.
+                            // This throttles them down to a managable level.
+                            if (profile.LastLoginAttemptUtc.HasValue && profile.LastLoginAttemptUtc > DateTime.UtcNow - TimeSpan.FromSeconds(1))
                             {
-                                AsyncManager.Parameters["returnUrl"] = returnUrl;
+                                System.Threading.Thread.Sleep(5000);
+                            }
+
+                            profile.LastLoginAttemptUtc = DateTime.UtcNow;
+
+                            if (TimeBasedOneTimePassword.IsValid(profile.TwoFactorSecret, model.TwoFactorCode))
+                            {
+                                if (Url.IsLocalUrl(returnUrl) && returnUrl.Length > 1 && returnUrl.StartsWith("/")
+                                    && !returnUrl.StartsWith("//") && !returnUrl.StartsWith("/\\"))
+                                {
+                                    AsyncManager.Parameters["returnUrl"] = returnUrl;
+                                }
+                                else
+                                {
+                                    AsyncManager.Parameters["action"] = "Index";
+                                    AsyncManager.Parameters["controller"] = "Home";
+                                }
                             }
                             else
                             {
-                                AsyncManager.Parameters["action"] = "Index";
-                                AsyncManager.Parameters["controller"] = "Home";
+                                ModelState.AddModelError("", "The two factor code is incorrect.");
                             }
                         }
                         else
@@ -68,28 +75,46 @@ namespace TwoFactorWeb.Controllers
                     }
                     else
                     {
-                        ModelState.AddModelError("", "The two factor code is incorrect.");
+                        ModelState.AddModelError("", "The user name or password provided is incorrect.");
                     }
                 }
-                else
-                {
-                    ModelState.AddModelError("", "The user name or password provided is incorrect.");
-                }
-            }
 
-            AsyncManager.Parameters["model"] = model;
-            AsyncManager.OutstandingOperations.Decrement();
+                AsyncManager.Parameters["model"] = model;
+            }
+            finally
+            {
+                AsyncManager.OutstandingOperations.Decrement();
+            }
         }
 
         [HttpPost]
         public void LogOnAsync(LogOnModel model, string returnUrl)
         {
             AsyncManager.OutstandingOperations.Increment();
-            Task.Factory.StartNew(() => { DoLogOn(model, returnUrl); });
+            AsyncManager.Parameters["task"] = Task.Factory.StartNew(() => { DoLogOn(model, returnUrl); });
         }
 
-        public ActionResult LogOnCompleted(string returnUrl, string action, string controller, LogOnModel model)
+        public ActionResult LogOnCompleted(Task task, string returnUrl, string action, string controller, LogOnModel model)
         {
+            try
+            {
+                task.Wait();
+            }
+            catch (AggregateException ex)
+            {
+                Exception baseException = ex.GetBaseException();
+
+                if (baseException is OneTimePasswordException)
+                {
+                    model = new LogOnModel();
+                    ModelState.AddModelError("", "This two factor code has already been used. Please wait for the next code to be generated and try again.");
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
             if (returnUrl != null)
             {
                 FormsAuthentication.SetAuthCookie(model.UserName, model.RememberMe);
