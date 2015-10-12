@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("TwoFactor")]
-[assembly: AssemblyDescription("Google authentication using RFC 4226 and RFC 6238")]
+[assembly: AssemblyDescription("Two factor authentication using RFC 4226 and RFC 6238")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Rick Bassham")]
 [assembly: AssemblyProduct("TwoFactor")]

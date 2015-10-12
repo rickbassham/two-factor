@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Runtime.Caching;
+using System.Collections.Generic;
 
 namespace TwoFactor
 {
@@ -7,11 +7,11 @@ namespace TwoFactor
     {
         public static readonly DateTime UNIX_EPOCH = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
-        private static MemoryCache _cache;
+        private static Dictionary<string, DateTime> _cache;
 
         static TimeBasedOneTimePassword()
         {
-            _cache = new MemoryCache("TimeBasedOneTimePassword");
+            _cache = new Dictionary<string, DateTime>();
         }
 
         public static string GetPassword(string secret)
@@ -48,20 +48,41 @@ namespace TwoFactor
             return (long)(now - epoch).TotalSeconds / timeStep;
         }
 
+        private static void CleanCache()
+        {
+            List<string> keysToRemove = new List<string>(_cache.Count);
+
+            foreach (KeyValuePair<string, DateTime> pair in _cache)
+            {
+                if ((DateTime.Now - pair.Value).TotalMinutes > 2)
+                {
+                    keysToRemove.Add(pair.Key);
+                }
+            }
+
+            foreach (string key in keysToRemove)
+            {
+                _cache.Remove(key);
+            }
+        }
+
         public static bool IsValid(string secret, string password, int checkAdjacentIntervals = 1)
         {
             // Keeping a cache of the secret/password combinations that have been requested allows us to
             // make this a real one time use system. Once a secret/password combination has been tested,
             // it cannot be tested again until after it is no longer valid.
             // See http://tools.ietf.org/html/rfc6238#section-5.2 for more info.
+
+            CleanCache();
+
             string cache_key = string.Format("{0}_{1}", secret, password);
 
-            if (_cache.Contains(cache_key))
+            if (_cache.ContainsKey(cache_key))
             {
                 throw new OneTimePasswordException("You cannot use the same secret/iterationNumber combination more than once.");
             }
 
-            _cache.Add(cache_key, cache_key, new CacheItemPolicy { SlidingExpiration = TimeSpan.FromMinutes(2) });
+            _cache.Add(cache_key, DateTime.Now);
 
             if (password == GetPassword(secret))
                 return true;

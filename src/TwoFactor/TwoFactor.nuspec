@@ -10,7 +10,7 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
     <releaseNotes>added nuspec</releaseNotes>
-    <copyright>Copyright 2012</copyright>
+    <copyright>Copyright 2012 Rick Bassham</copyright>
     <tags>twofactor authentication</tags>
   </metadata>
 </package>

@@ -3,23 +3,27 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using NUnit.Framework;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace TwoFactor.Tests
 {
-    [TestFixture]
+    [NUnit.Framework.TestFixture]
+    [Microsoft.VisualStudio.TestTools.UnitTesting.TestClass]
     public class TimeBasedTestFixture
     {
         private void Test(string sharedSecret, long seconds, string expected)
         {
             var calculated = TimeBasedOneTimePassword.GetPassword(sharedSecret, TimeBasedOneTimePassword.UNIX_EPOCH + TimeSpan.FromSeconds(seconds), TimeBasedOneTimePassword.UNIX_EPOCH, 30, 8);
 
-            Assert.AreEqual(expected, calculated);
+            Microsoft.VisualStudio.TestTools.UnitTesting.Assert.AreEqual(expected, calculated);
+            NUnit.Framework.Assert.AreEqual(expected, calculated);
         }
 
         /// <summary>
         /// This test comes from Table 1 in RFC 6238 which defines expected values for a given time.
         /// </summary>
-        [Test]
+        [NUnit.Framework.Test]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
         public void TestRfc()
         {
             string sharedSecret = "12345678901234567890";
