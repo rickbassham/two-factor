@@ -1,6 +1,8 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.31101.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TwoFactor", "TwoFactor\TwoFactor.csproj", "{903279E1-4D47-4F18-A6F6-ED61EAAD8176}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TwoFactorConsole", "TwoFactorConsole\TwoFactorConsole.csproj", "{73614000-93AF-468A-BF05-0258A3AFF8D5}"
